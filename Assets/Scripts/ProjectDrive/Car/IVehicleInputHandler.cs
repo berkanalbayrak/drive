@@ -2,7 +2,7 @@
 {
     public interface IVehicleInputHandler
     {
-        float GetThrottleInput();
-        float GetBrakeInput();
+        public float ThrottleInput { get; }
+        float BrakeInput { get; } 
     }
 }

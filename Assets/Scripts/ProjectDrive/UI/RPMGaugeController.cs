@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 
 namespace ProjectDrive.UI
@@ -13,12 +14,31 @@ namespace ProjectDrive.UI
         private const float MIN_ANGLE = 180f;
         private const float MAX_ANGLE = -80;
 
-        [Header("Speed Display Settings")]
+        [Header("Text References")]
         public TextMeshProUGUI speedText;
         public TextMeshProUGUI gearText;
 
-        // Update is called once per frame
-        void Update()
+        private EventBinding<PlayerCarUpdateEvent> _playerCarUpdateEventBinding;
+
+        private void OnEnable()
+        {
+            _playerCarUpdateEventBinding = new EventBinding<PlayerCarUpdateEvent>(OnPlayerCarUpdate);
+            EventBus<PlayerCarUpdateEvent>.Register(_playerCarUpdateEventBinding);
+        }
+
+        private void OnPlayerCarUpdate(PlayerCarUpdateEvent @event)
+        {
+            UpdateSpeed(@event.Speed);
+            UpdateRPM(@event.RPM);
+            UpdateGearText(@event.gearNumber);
+        }
+
+        private void OnDisable()
+        {
+            EventBus<PlayerCarUpdateEvent>.Deregister(_playerCarUpdateEventBinding);
+        }
+
+        private void Update()
         {
             currentRPM = Mathf.Clamp(currentRPM, 0, maxRPM);
 
@@ -34,20 +54,20 @@ namespace ProjectDrive.UI
                 currentSpeed = 0;
             }
         }
-        
-        public void UpdateRPM(float rpm)
+
+        private void UpdateRPM(float rpm)
         {
             currentRPM = rpm;
         }
-        
-        public void UpdateSpeed(float speed)
+
+        private void UpdateSpeed(float speed)
         {
             currentSpeed = speed;
         }
 
-        public void UpdateGearText(int gear)
+        private void UpdateGearText(int gearNumber)
         {
-            gearText.text = gear.ToString();
+            gearText.text = gearNumber != 0 ? gearNumber.ToString() : "N";
         }
     }
 }

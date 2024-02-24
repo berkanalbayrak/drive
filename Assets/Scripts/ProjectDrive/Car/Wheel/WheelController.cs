@@ -27,8 +27,6 @@ namespace ProjectDrive.Car.Wheel
         private void Update()
         {
             UpdateWheelPose();
-
-            Debug.Log($"Wheel {wheelObject.name} RPM: {wheelCollider.rpm}");
         }
 
         private void UpdateWheelPose()

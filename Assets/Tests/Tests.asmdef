@@ -4,7 +4,8 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "ProjectDrive"
+        "ProjectDrive",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [
         "Editor"

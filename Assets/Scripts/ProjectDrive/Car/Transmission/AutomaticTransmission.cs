@@ -1,16 +1,19 @@
 ﻿using System.Linq;
 using Cysharp.Threading.Tasks;
 using ProjectDrive.Car.Transmission.Config;
+using UnityEngine;
 
 namespace ProjectDrive.Car.Transmission
 {
     public class AutomaticTransmission
     {
-        public float ClutchInput { get; private set; } = 0f;
+        public float ClutchInput { get; private set; } = 1f;
         public int CurrentGearIndex { get; private set; }
         public bool IsShifting { get; private set; }
         
-        public float CurrentGearRatio => _gears[CurrentGearIndex].ratio;
+        public float CurrentGearRatio => CurrentGearIndex >= 0 ? _gears[CurrentGearIndex].ratio : 0f;
+        
+        public float TargetSpeed => CurrentGearIndex >= 0 ? _gears[CurrentGearIndex].targetSpeed : Mathf.Infinity;
         
         private readonly Gear[] _gears;
         private readonly float _gearShiftingDelay;
@@ -23,26 +26,30 @@ namespace ProjectDrive.Car.Transmission
             _gearShiftingDelay = config.gearShiftingDelay;
             _gearShiftUpRpm = config.gearShiftUpRPM;
             _gearShiftDownRpm = config.gearShiftDownRPM;
-            CurrentGearIndex = 0;
+            CurrentGearIndex = -1;
         }
 
         public void HandleTransmission(float carSpeed, float engineRPM)
         {
             if (ShouldShiftUp(carSpeed, engineRPM))
             {
-                ShiftGear(CurrentGearIndex + 1).Forget();
+                ShiftUp();
             }
             else if (ShouldShiftDown(carSpeed, engineRPM))
             {
-                ShiftGear(CurrentGearIndex - 1).Forget();
+                ShiftDown();
             }
         }
+        
+        public void ShiftUp() => ShiftGear(CurrentGearIndex + 1).Forget();
+        private void ShiftDown() => ShiftGear(CurrentGearIndex - 1).Forget();
 
+        
         private bool ShouldShiftUp(float carSpeed, float engineRPM)
         {
             return CurrentGearIndex < _gears.Length - 1 
                    && !IsShifting 
-                   && carSpeed >= _gears[CurrentGearIndex].targetSpeed 
+                   && carSpeed >= TargetSpeed
                    && engineRPM >= _gearShiftUpRpm;
         }
 
@@ -50,7 +57,7 @@ namespace ProjectDrive.Car.Transmission
         {
             return CurrentGearIndex > 0 
                    && !IsShifting 
-                   && carSpeed < _gears[CurrentGearIndex - 1].targetSpeed 
+                   && carSpeed < TargetSpeed 
                    && engineRPM <= _gearShiftDownRpm;
         }
 

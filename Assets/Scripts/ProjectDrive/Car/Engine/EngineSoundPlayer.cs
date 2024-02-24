@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace ProjectDrive.Car.Engine
 {
@@ -14,15 +16,27 @@ namespace ProjectDrive.Car.Engine
         [SerializeField] private AudioClip mediumOffClip;
         [SerializeField] private AudioClip highOnClip;
         [SerializeField] private AudioClip highOffClip;
-
-        private float _minRPM;
-        private float _maxRPM;
-
-        private float _currentRpm;
-        private bool _isGasOn;
+        [SerializeField] private AudioClip redlineClip;
 
         private Engine _engine;
         
+        private float _minRPM;
+        private float _maxRPM;
+
+        private const float lowRPMMaxRange = 2000;
+        private const float mediumRPMMaxRange = 4000;
+        private const float highRPMMaxRange = 7000;
+        
+        private float _currentRpm;
+        private bool _isGasOn;
+        
+        private float _defaultVolume;
+
+        private void Awake()
+        {
+            _defaultVolume = engineAudioSource.volume;
+        }
+
         private void Update()
         {
             UpdateEngineSound();
@@ -31,6 +45,8 @@ namespace ProjectDrive.Car.Engine
         public void Initialize(Engine engine)
         {
             _engine = engine;
+            _minRPM = engine.IdleRPM;
+            _maxRPM = engine.MaxRPM;
         }
         
         public void UpdateEngineState(float rpm, bool carOn, float throttleInput, float brakeInput)
@@ -46,16 +62,51 @@ namespace ProjectDrive.Car.Engine
             {
                 PlayClip(selectedClip);
             }
-
-            AdjustPitchBasedOnRPM();
+            
+            var rpmRange = GetRPMRangeForClip(selectedClip);
+            
+            if(selectedClip != redlineClip)
+                AdjustPitchBasedOnRPM(rpmRange.Item1, rpmRange.Item2);
         }
 
         private AudioClip SelectClipBasedOnRPM()
         {
             if (_currentRpm <= 800) return idleClip;
-            if (_currentRpm < _maxRPM / 3) return _isGasOn ? lowOnClip : lowOffClip;
-            if (_currentRpm < _maxRPM * 2 / 3) return _isGasOn ? mediumOnClip : mediumOffClip;
-            return _isGasOn ? highOnClip : highOffClip;
+            
+            // if (_currentRpm < lowRPMMaxRange) return _isGasOn ? lowOnClip : lowOffClip;
+            // if (_currentRpm < mediumRPMMaxRange) return _isGasOn ? mediumOnClip : mediumOffClip;
+            // if (_currentRpm < highRPMMaxRange) return _isGasOn ? highOnClip : highOffClip;
+
+            //For Testing Purposes
+            if (_currentRpm < mediumRPMMaxRange) return _isGasOn ? lowOnClip : lowOffClip;
+            if (_currentRpm < highRPMMaxRange) return _isGasOn ? highOnClip : highOffClip;
+            //----------------------
+            return redlineClip;
+        }
+        
+        private Tuple<float, float> GetRPMRangeForClip(AudioClip clip)
+        {
+            // if(clip == idleClip)
+            //     return new Tuple<float, float>(0, 800);
+            // if(clip == lowOnClip || clip == lowOffClip)
+            //     return new Tuple<float, float>(800, lowRPMMaxRange);
+            // if(clip == mediumOnClip || clip == mediumOffClip)
+            //     return new Tuple<float, float>(lowRPMMaxRange, mediumRPMMaxRange);
+            // if(clip == highOnClip || clip == highOffClip)
+            //     return new Tuple<float, float>(mediumRPMMaxRange, highRPMMaxRange);
+            
+            
+            //For Testing Purposes
+            if(clip == idleClip)
+                return new Tuple<float, float>(0, 800);
+            if(clip == lowOnClip || clip == lowOffClip)
+                return new Tuple<float, float>(800, mediumRPMMaxRange);
+            if(clip == highOnClip || clip == highOffClip)
+                return new Tuple<float, float>(mediumRPMMaxRange, highRPMMaxRange);
+            //----------------------
+
+            
+            return new Tuple<float, float>(highRPMMaxRange, _maxRPM);
         }
 
         private bool HasClipChanged(AudioClip newClip)
@@ -69,9 +120,9 @@ namespace ProjectDrive.Car.Engine
             engineAudioSource.Play();
         }
 
-        private void AdjustPitchBasedOnRPM()
+        private void AdjustPitchBasedOnRPM(float minRPMRange, float maxRPMRange)
         {
-            engineAudioSource.pitch = Mathf.Lerp(0.75f, 1.25f, Mathf.InverseLerp(_engine.IdleRPM, _engine.MaxRPM, _currentRpm));
+            engineAudioSource.pitch = Mathf.Lerp(0.90f, 1.20f, Mathf.InverseLerp(minRPMRange, maxRPMRange, _currentRpm));
         }
     }
 }

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gearShiftUpRPM: 6500
   gearShiftDownRPM: 3500
-  gearShiftingDelay: 0.3
+  gearShiftingDelay: 0.2
   gears:
   - ratio: 3.3
     targetSpeed: 42
