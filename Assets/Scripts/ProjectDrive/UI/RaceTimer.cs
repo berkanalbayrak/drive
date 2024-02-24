@@ -40,7 +40,6 @@ namespace ProjectDrive.UI
 
         private void OnRaceStartEvent(RaceStartEvent @event)
         {
-            Show();
             StartTimer();
         }
 
@@ -55,7 +54,7 @@ namespace ProjectDrive.UI
             }
         }
 
-        public void StartTimer()
+        private void StartTimer()
         {
             if (!isRunning)
             {
@@ -66,16 +65,10 @@ namespace ProjectDrive.UI
             }
         }
 
-        public void Show()
+        private void Hide()
         {
-            timerText.enabled = true;
-            bestTimeText.enabled = true;
-        }
-
-        public void Hide()
-        {
-            timerText.enabled = false;
-            bestTimeText.enabled = false;
+            timerText.text = string.Empty;
+            bestTimeText.text = string.Empty;
         }
 
         private void UpdateBestTime()
