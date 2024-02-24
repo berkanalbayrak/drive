@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using ProjectDrive.Car.Engine;
 using ProjectDrive.Car.Engine.Config;
 using ProjectDrive.Car.Transmission;
 using ProjectDrive.Car.Transmission.Config;
@@ -15,10 +16,12 @@ namespace ProjectDrive.Car
         [SerializeField] private EngineConfigSO engineConfigSO;
         [SerializeField] private AutomaticTransmissionConfigSO automaticTransmissionConfigSO;
         [SerializeField] private WheelController[] wheelControllers;
+        [SerializeField] private EngineSoundPlayer engineSoundPlayer;
         [SerializeField] private Rigidbody rigidBody;
 
         private Engine.Engine engine;
         private AutomaticTransmission automaticTransmission;
+        
         
         private float ThrottleInput { get; set; }
         private float BrakeInput { get; set; }
@@ -26,6 +29,7 @@ namespace ProjectDrive.Car
         private void Start()
         {
             engine = new Engine.Engine(engineConfigSO);
+            engineSoundPlayer.Initialize(engine);
             automaticTransmission = new AutomaticTransmission(automaticTransmissionConfigSO);
             engine.Start();
         }
@@ -35,6 +39,7 @@ namespace ProjectDrive.Car
             HandleUserInput();
             UpdateTransmission();
             ApplyEnginePower();
+            engineSoundPlayer.UpdateEngineState(engine.CurrentRPM, engine.IsRunning, ThrottleInput, BrakeInput);
             UpdateUI();
         }
 
