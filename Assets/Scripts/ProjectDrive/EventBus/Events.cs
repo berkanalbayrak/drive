@@ -1,26 +1,27 @@
-﻿
-public interface IEvent {}
-
-#region InputEvents
-
-public interface InputEvent : IEvent
+﻿namespace ProjectDrive.EventBus
 {
-    public float Value { get; set; }
-}
+    public interface IEvent {}
 
-public struct ThrottleInputEvent : InputEvent
-{
-    public float Value { get; set; }
-}
+    #region InputEvents
 
-public struct BrakeInputEvent : InputEvent
-{
-    public float Value { get; set; }
-}
+    public interface InputEvent : IEvent
+    {
+        public float Value { get; set; }
+    }
 
-#endregion
+    public struct ThrottleInputEvent : InputEvent
+    {
+        public float Value { get; set; }
+    }
 
-#region GameEvents
+    public struct BrakeInputEvent : InputEvent
+    {
+        public float Value { get; set; }
+    }
+
+    #endregion
+
+    #region GameEvents
 
     public struct StartCountdownEvent : IEvent {}
 
@@ -39,4 +40,5 @@ public struct BrakeInputEvent : InputEvent
         public float Speed;
         public int gearNumber;
     }
-#endregion
+    #endregion
+}

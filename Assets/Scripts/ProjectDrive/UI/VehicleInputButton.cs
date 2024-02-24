@@ -1,10 +1,8 @@
-﻿using System;
+﻿using ProjectDrive.EventBus;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
-using UnityEngine.UI;
 
-namespace ProjectDrive
+namespace ProjectDrive.UI
 {
     public abstract class VehicleInputButton<T> : MonoBehaviour, IPointerDownHandler, IPointerUpHandler where T : InputEvent, 
          new()

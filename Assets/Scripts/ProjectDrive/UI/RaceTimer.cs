@@ -1,11 +1,9 @@
-﻿using System;
-using DG.Tweening;
+﻿using ProjectDrive.EventBus;
 using ProjectDrive.Utils;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
-namespace ProjectDrive.Core
+namespace ProjectDrive.UI
 {
     public class RaceTimer : MonoBehaviour
     {

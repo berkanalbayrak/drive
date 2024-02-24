@@ -1,32 +1,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class EventBus<T> where T : IEvent
+namespace ProjectDrive.EventBus
 {
-    private static readonly HashSet<IEventBinding<T>> bindings = new();
-
-    public static void Register(EventBinding<T> binding)
+    public static class EventBus<T> where T : IEvent
     {
-        bindings.Add(binding);
-    }
+        private static readonly HashSet<IEventBinding<T>> bindings = new();
 
-    public static void Deregister(EventBinding<T> binding)
-    {
-        bindings.Remove(binding);
-    }
-
-    public static void Raise(T @event)
-    {
-        foreach (var binding in bindings)
+        public static void Register(EventBinding<T> binding)
         {
-            binding.OnEvent.Invoke(@event);
-            binding.OnEventNoArgs.Invoke();
+            bindings.Add(binding);
         }
-    }
 
-    private static void Clear()
-    {
-        Debug.Log($"Clearing {typeof(T).Name} bindings");
-        bindings.Clear();
+        public static void Deregister(EventBinding<T> binding)
+        {
+            bindings.Remove(binding);
+        }
+
+        public static void Raise(T @event)
+        {
+            foreach (var binding in bindings)
+            {
+                binding.OnEvent.Invoke(@event);
+                binding.OnEventNoArgs.Invoke();
+            }
+        }
+
+        private static void Clear()
+        {
+            Debug.Log($"Clearing {typeof(T).Name} bindings");
+            bindings.Clear();
+        }
     }
 }
